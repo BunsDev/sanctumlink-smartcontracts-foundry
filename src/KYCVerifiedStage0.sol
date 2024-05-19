@@ -81,6 +81,8 @@ contract KYCVerifiedStage0 is FunctionsClient, Ownable {
         VerifiedProperties newVerifiedProperties
     );
 
+    event RewardClaimed(bytes32 indexed sanctumLinkIdentity, uint256 amount);
+
     constructor(
         uint64 functionSubscriptionId,
         SLCToken _slcToken
@@ -233,7 +235,12 @@ contract KYCVerifiedStage0 is FunctionsClient, Ownable {
             isCompletelyPopulated &&
             !rewardClaimed[stringToBytes32(sanctumLinkIdentity)]
         ) {
-            i_slcToken.mint(msg.sender, rewardAmount);
+            uint256 adjustedRewardAmount = rewardAmount * PRECISION;
+            i_slcToken.mint(msg.sender, adjustedRewardAmount);
+            emit RewardClaimed(
+                stringToBytes32(sanctumLinkIdentity),
+                rewardAmount
+            );
             rewardClaimed[stringToBytes32(sanctumLinkIdentity)] = true;
         }
         s_sanctumLinkIdentityToKYCStage0VerifiedProperties[
