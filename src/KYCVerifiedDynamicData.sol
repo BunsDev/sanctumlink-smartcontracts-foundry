@@ -3,10 +3,9 @@ pragma solidity 0.8.19;
 
 import {FunctionsClient} from "@chainlink/contracts/src/v0.8/functions/dev/v1_0_0/FunctionsClient.sol";
 import {FunctionsRequest} from "@chainlink/contracts/src/v0.8/functions/dev/v1_0_0/libraries/FunctionsRequest.sol";
-import {KYCVerifiedAddressesStorage} from "./KYCVerifiedAddressesStorage.sol";
 
 /**
- * @title KYCVerifiedStage0
+ * @title KYCVerifiedDynamicData
  * @author Isaiah Idonije
  *
  *
@@ -51,20 +50,7 @@ contract KYCVerifiedStage0 {
 
     uint64 subscriptionId;
 
-    struct VerifiedProperties {
-        bytes idDocument;
-        bytes birthCertificateDocument;
-        bytes utilityBill;
-    }
-
-    KYCVerifiedAddressesStorage public kycVerifiedAddressesStorage;
-
-    constructor(
-        KYCVerifiedAddressesStorage _kycVerifiedAddressesStorage,
-        uint64 functionSubscriptionId
-    ) {
-        kycVerifiedAddressesStorage = _kycVerifiedAddressesStorage;
-        kycVerifiedAddressesStorage.addContractAddress(address(this));
+    constructor(uint64 functionSubscriptionId) {
         subscriptionId = functionSubscriptionId;
     }
 }

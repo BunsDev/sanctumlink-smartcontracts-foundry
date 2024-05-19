@@ -12,3 +12,6 @@ docs/
 
 # Dotenv file
 .env
+
+# Ignores node_modules
+node_modules

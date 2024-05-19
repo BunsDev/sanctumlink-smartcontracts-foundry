@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.19;
+pragma solidity ^0.8.19;
+
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
  * @title CreateSanctumLinkIdentity
@@ -20,68 +22,54 @@ pragma solidity 0.8.19;
  *
  */
 
-contract CreateSanctumLinkIdentity {
-    address public owner;
-    address public connnectedWallet;
-    bytes32 public sanctumLinkIdentity = bytes32(0);
-    bytes32[] public sanctumLinkIdentities;
+contract CreateSanctumLinkIdentity is Ownable {
+    address public s_connnectedWallet;
+    bytes32 public s_sanctumLinkIdentity;
+    bytes32[] public s_sanctumLinkIdentities;
 
     // Mapping to link connected wallet to SanctumLink Identity
-    mapping(bytes32 => address) public connectedWalletToSanctumLinkIdentity;
+    mapping(bytes32 => address) public s_connectedWalletToSanctumLinkIdentity;
 
     // Mapping to link SanctumLink Identity to connected wallet
-    mapping(address => bytes32) public sanctumLinkIdentityToConnectedWallet;
+    mapping(address => bytes32) public s_sanctumLinkIdentityToConnectedWallet;
 
     // Event to emit when sanctumLinkIdentity is created
     event sanctumLinkIdentityCreated(bytes32 indexed sanctumLinkIdentity);
 
-    constructor() {
-        owner = msg.sender;
-    }
-
-    modifier onlyOwner() {
-        require(msg.sender == owner, "Only owner can call this function");
-        _;
-    }
+    constructor() Ownable(msg.sender) {}
 
     /**
      *
-     * @param _wallet This wallet is connected to the SanctumLink Identity
      * @param _email This is the verified email of user creating a SanctumLink Identity
      * @notice This function creates an Identity on SanctumLink protocol and created SanctumLink Identity is linked
      * to the connected wallet
      * @notice After the function createSanctumLinkIdentity() is executed and the above notice is effected, the user is logged
-     * in and redirected to page to fill in kyc information - Stage 0. The url of this page can look something like
-     * http://localhost:8000/{username}/provide_stage_0_information
+     * in and redirected to the Dapp dashboard
      * @notice In other words, after createSanctumLinkIdentity() is successfully executed, the Dapp reads the emitted
-     * event from the blockchain, in this case the SanctumLink Identity, then queries the SanctumLink Centralized Service to
-     * login in the user with that SanctumLink Identity.
+     * event from the blockchain, in this case the SanctumLink Identity, triggering an offchain event of logging in the user.
      */
-    function createSanctumLinkIdentity(
-        address _wallet,
-        string memory _email
-    ) external {
-        sanctumLinkIdentity = createIdentity(_email);
-        sanctumLinkIdentities.push(sanctumLinkIdentity);
-        emit sanctumLinkIdentityCreated(sanctumLinkIdentity);
-        connnectedWallet = _wallet;
+    function createSanctumLinkIdentity(string memory _email) private {
+        s_sanctumLinkIdentity = createIdentity(_email);
+        s_sanctumLinkIdentities.push(s_sanctumLinkIdentity);
+        emit sanctumLinkIdentityCreated(s_sanctumLinkIdentity);
+        s_connnectedWallet = msg.sender;
         require(
-            connectedWalletToSanctumLinkIdentity[sanctumLinkIdentity] ==
+            s_connectedWalletToSanctumLinkIdentity[s_sanctumLinkIdentity] ==
                 address(0),
             "Identity already connected to wallet!"
         );
-        connectedWalletToSanctumLinkIdentity[
-            sanctumLinkIdentity
-        ] = connnectedWallet;
-        sanctumLinkIdentityToConnectedWallet[
-            connnectedWallet
-        ] = sanctumLinkIdentity;
+        s_connectedWalletToSanctumLinkIdentity[
+            s_sanctumLinkIdentity
+        ] = s_connnectedWallet;
+        s_sanctumLinkIdentityToConnectedWallet[
+            s_connnectedWallet
+        ] = s_sanctumLinkIdentity;
     }
 
     // Helper function to create an Identity
     function createIdentity(
         string memory _email
-    ) internal pure returns (bytes32) {
+    ) private pure returns (bytes32) {
         return sha256(abi.encodePacked(_email));
     }
 
@@ -89,14 +77,14 @@ contract CreateSanctumLinkIdentity {
     function getConnectedWallet(
         bytes32 _sanctumLinkIdentity
     ) public view returns (address) {
-        return connectedWalletToSanctumLinkIdentity[_sanctumLinkIdentity];
+        return s_connectedWalletToSanctumLinkIdentity[_sanctumLinkIdentity];
     }
 
     // Getter function to retrieve the SanctumLink Identity associated with the connected wallet
     function getSanctumLinkIdentity(
         address _connectedWallet
     ) public view returns (bytes32) {
-        return sanctumLinkIdentityToConnectedWallet[_connectedWallet];
+        return s_sanctumLinkIdentityToConnectedWallet[_connectedWallet];
     }
 
     // Getter function to retrieve all SanctumLink Identities
@@ -106,6 +94,6 @@ contract CreateSanctumLinkIdentity {
         onlyOwner
         returns (bytes32[] memory)
     {
-        return sanctumLinkIdentities;
+        return s_sanctumLinkIdentities;
     }
 }
