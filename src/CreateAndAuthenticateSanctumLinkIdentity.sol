@@ -51,7 +51,7 @@ contract CreateSanctumLinkIdentity is Ownable {
     // Custom errors
     error CreateAndAuthenticateSanctumLinkIdentity__WalletNotFound();
     error CreateAndAuthenticateSanctumLinkIdentity__IdentityAlreadyExists();
-    error CreateAndAuthenticateSanctumLinkIdentity__WalletAlreadyHasIdentity()
+    error CreateAndAuthenticateSanctumLinkIdentity__WalletAlreadyHasIdentity();
 
     bytes32[] public s_sanctumLinkIdentities;
     uint256 public authenticationTimeout; // Timeout period in seconds
