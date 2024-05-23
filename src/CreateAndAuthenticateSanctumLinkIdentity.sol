@@ -51,6 +51,7 @@ contract CreateSanctumLinkIdentity is Ownable {
     // Custom errors
     error CreateAndAuthenticateSanctumLinkIdentity__WalletNotFound();
     error CreateAndAuthenticateSanctumLinkIdentity__IdentityAlreadyExists();
+    error CreateAndAuthenticateSanctumLinkIdentity__WalletAlreadyHasIdentity()
 
     bytes32[] public s_sanctumLinkIdentities;
     uint256 public authenticationTimeout; // Timeout period in seconds
@@ -71,6 +72,11 @@ contract CreateSanctumLinkIdentity is Ownable {
      * event from the blockchain, in this case the SanctumLink Identity, triggering an offchain event of logging in the user.
      */
     function createSanctumLinkIdentity(string memory _email) public {
+        // Check if the wallet is already connected to an existing SanctumLink Identity
+        if (s_sanctumLinkIdentityToConnectedWallet[msg.sender] != bytes32(0)) {
+            revert CreateAndAuthenticateSanctumLinkIdentity__WalletAlreadyHasIdentity();
+        }
+
         bytes32 sanctumLinkIdentity = createIdentity(_email);
         s_sanctumLinkIdentities.push(sanctumLinkIdentity);
         emit SanctumLinkIdentityCreated(sanctumLinkIdentity);

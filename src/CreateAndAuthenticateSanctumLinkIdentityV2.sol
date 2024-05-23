@@ -68,6 +68,7 @@ contract CreateAndAuthenticateSanctumLinkIdentityV2 is Ownable {
     // Custom errors
     error CreateAndAuthenticateSanctumLinkIdentityV2__WalletNotFound();
     error CreateAndAuthenticateSanctumLinkIdentityV2__IdentityAlreadyConnectedToWallet();
+    error CreateAndAuthenticateSanctumLinkIdentityV2__WalletAlreadyHasIdentity();
     error CreateAndAuthenticateSanctumLinkIdentityV2__AddressNotAuthenticated();
     error CreateAndAuthenticateSanctumLinkIdentityV2__WalletAlreadyConnected();
     error CreateAndAuthenticateSanctumLinkIdentityV2__WalletNotAuthorizedForAddition();
@@ -92,9 +93,18 @@ contract CreateAndAuthenticateSanctumLinkIdentityV2 is Ownable {
      * event from the blockchain, in this case the SanctumLink Identity, triggering an offchain event of logging in the user.
      */
     function createSanctumLinkIdentity(string memory _email) public {
+        address connectedWallet = msg.sender;
+
+        // Check if the wallet is already connected to an existing SanctumLink Identity
+        if (
+            s_sanctumLinkIdentityToConnectedWallet[connectedWallet] !=
+            bytes32(0)
+        ) {
+            revert CreateAndAuthenticateSanctumLinkIdentityV2__WalletAlreadyHasIdentity();
+        }
+
         bytes32 sanctumLinkIdentity = createIdentity(_email);
         s_sanctumLinkIdentities.push(sanctumLinkIdentity);
-        address connectedWallet = msg.sender;
         emit SanctumLinkIdentityCreated(sanctumLinkIdentity);
 
         if (
