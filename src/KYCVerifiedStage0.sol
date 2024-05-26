@@ -5,29 +5,23 @@ import {FunctionsClient} from "@chainlink/contracts/src/v0.8/functions/dev/v1_0_
 import {FunctionsRequest} from "@chainlink/contracts/src/v0.8/functions/dev/v1_0_0/libraries/FunctionsRequest.sol";
 import {FunctionsSource} from "./FunctionsSource.sol";
 import {SLCToken} from "./SLCToken.sol";
+import {CreateAndAuthenticateSanctumLinkIdentityV2} from "./CreateAndAuthenticateSanctumLinkIdentityV2.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
  * @title KYCVerifiedStage0
- * @author Isaiah Idonije
- *
- *
  * @notice This will be the first stage of storing KYC verified properties onchain
  * @notice The verified attributes are hardcoded for this contract.
- * @notice The chainlink functions limit will be increased from 256 bytes
  */
-
 contract KYCVerifiedStage0 is FunctionsClient, Ownable {
     using FunctionsRequest for FunctionsRequest.Request;
 
-    // Custom error type
-    error UnexpectedRequestID(bytes32 requestId);
-    error InvalidRouter(address router);
-    error LatestVerifiedKYCRequestNotYetFulfilled();
+    // Custom error types
+    error KYCVerifiedStage0__AddressNotAuthenticated();
 
     struct VerifiedProperties {
         bytes32 primaryEmail;
-        bytes32 name;
+        bytes32 nameOfUser;
         bytes32 primaryPhone;
         bytes32 dateOfBirth;
         bytes32 birthCertificateDocument;
@@ -39,32 +33,26 @@ contract KYCVerifiedStage0 is FunctionsClient, Ownable {
         bytes32 utilityBillForPrimaryResidence;
     }
 
+    CreateAndAuthenticateSanctumLinkIdentityV2 public createAndAuthenticateSanctumLinkIdentity
     FunctionsSource internal immutable i_functionsSource;
-
     SLCToken internal immutable i_slcToken;
+
     uint256 public rewardAmount = 50;
     uint256 private constant PRECISION = 1e16;
 
-    // Hardcoded for Fuji
-    // Supported networks https://docs.chain.link/chainlink-functions/supported-networks
     address router = 0xA9d587a00A31A52Ed70D6026794a8FC5E2F5dCb0;
     bytes32 donID =
         0x66756e2d6176616c616e6368652d66756a692d31000000000000000000000000;
 
-    //Callback gas limit
     uint32 gasLimit = 300000;
-
     uint64 subscriptionId;
 
-    // State variables to store the last request ID, response, and error
-    bytes32 internal s_lastRequestId;
-    bytes internal s_lastResponse;
-    bytes internal s_lastError;
-
+    // Mappings to store request-related data
     mapping(bytes32 => VerifiedProperties)
         public s_sanctumLinkIdentityToKYCStage0VerifiedProperties;
-
     mapping(bytes32 => bool) public rewardClaimed;
+    mapping(bytes32 => bytes) public s_responses;
+    mapping(bytes32 => bytes) public s_errors;
 
     // Event to log responses
     event Response(
@@ -81,15 +69,20 @@ contract KYCVerifiedStage0 is FunctionsClient, Ownable {
         VerifiedProperties newVerifiedProperties
     );
 
-    event RewardClaimed(bytes32 indexed sanctumLinkIdentity, uint256 amount);
+    event RewardClaimed(bytes32 indexed sanctumLinkIdentity, uint256 valueInWei, string valueString);
 
     constructor(
         uint64 functionSubscriptionId,
-        SLCToken _slcToken
+        SLCToken _slcToken,
+        address _createAndAuthenticateSanctumLinkIdentity
     ) FunctionsClient(router) Ownable(msg.sender) {
         subscriptionId = functionSubscriptionId;
         i_functionsSource = new FunctionsSource();
         i_slcToken = _slcToken;
+        createSanctumLinkIdentity = CreateSanctumLinkIdentityV2(
+            _createSanctumLinkIdentity
+        );
+
     }
 
     function setRewardAmount(uint256 _rewardAmount) external onlyOwner {
@@ -99,9 +92,9 @@ contract KYCVerifiedStage0 is FunctionsClient, Ownable {
     function sendRequest(
         string memory _sanctumLinkIdentity
     ) external returns (bytes32 requestId) {
-        if (s_lastRequestId != bytes32(0))
-            revert LatestVerifiedKYCRequestNotYetFulfilled();
-
+        if (!createAndAuthenticateSanctumLinkIdentity.isAuthenticated(msg.sender)) {
+            revert KYCVerifiedStage0__AddressNotAuthenticated();
+        }
         string[] memory args = new string[](1);
         args[0] = _sanctumLinkIdentity;
 
@@ -118,8 +111,6 @@ contract KYCVerifiedStage0 is FunctionsClient, Ownable {
             gasLimit,
             donID
         );
-
-        s_lastRequestId = requestId;
     }
 
     function fulfillRequest(
@@ -127,14 +118,14 @@ contract KYCVerifiedStage0 is FunctionsClient, Ownable {
         bytes memory response,
         bytes memory err
     ) internal override {
-        if (s_lastRequestId != requestId) {
-            revert UnexpectedRequestID(requestId); // Check if request IDs match
-        }
-        // Update the contract's state variables with the response and any errors
+        // Store the response and any errors
+        s_responses[requestId] = response;
+        s_errors[requestId] = err;
+
         (
             string memory sanctumLinkIdentity,
             string memory primaryEmail,
-            string memory name,
+            string memory nameOfUser,
             string memory primaryPhone,
             string memory dateOfBirth,
             string memory birthCertificateDocument,
@@ -170,48 +161,41 @@ contract KYCVerifiedStage0 is FunctionsClient, Ownable {
         VerifiedProperties memory oldVerifiedProperties = s_verifiedProperties;
         bool isCompletelyPopulated = true;
 
-        // Update the contract's state variables with the response and any errors
-        s_lastResponse = response;
-
-        s_verifiedProperties.primaryEmail = stringToBytes32(primaryEmail);
-        s_verifiedProperties.name = stringToBytes32(name);
-        s_verifiedProperties.primaryPhone = stringToBytes32(primaryPhone);
-        s_verifiedProperties.dateOfBirth = stringToBytes32(dateOfBirth);
-        s_verifiedProperties.birthCertificateDocument = stringToBytes32(
-            birthCertificateDocument
-        );
-        s_verifiedProperties.countryOfBirth = stringToBytes32(countryOfBirth);
-        s_verifiedProperties.nationalId = stringToBytes32(nationalId);
-        s_verifiedProperties.currentCountryOfResidence = stringToBytes32(
-            currentCountryOfResidence
-        );
-        s_verifiedProperties.currentStateOfResidence = stringToBytes32(
-            currentStateOfResidence
-        );
-        s_verifiedProperties.primaryPhysicalAddress = stringToBytes32(
-            primaryPhysicalAddress
-        );
-        s_verifiedProperties.utilityBillForPrimaryResidence = stringToBytes32(
-            utilityBillForPrimaryResidence
-        );
-
-        // s_verifiedProperties = VerifiedProperties({
-        //     primaryEmail: stringToBytes32(primaryEmail),
-        //     name: stringToBytes32(name),
-        //     primaryPhone: stringToBytes32(primaryPhone),
-        //     dateOfBirth: stringToBytes32(dateOfBirth),
-        //     birthCertificateDocument: stringToBytes32(birthCertificateDocument),
-        //     countryOfBirth: stringToBytes32(countryOfBirth),
-        //     nationalId: stringToBytes32(nationalId),
-        //     currentCountryOfResidence: stringToBytes32(
-        //         currentCountryOfResidence
-        //     ),
-        //     currentStateOfResidence: stringToBytes32(currentStateOfResidence),
-        //     primaryPhysicalAddress: stringToBytes32(primaryPhysicalAddress),
-        //     utilityBillForPrimaryResidence: stringToBytes32(
-        //         utilityBillForPrimaryResidence
-        //     )
-        // });
+        if (primaryEmail != "")
+            s_verifiedProperties.primaryEmail = stringToBytes32(primaryEmail);
+        if (nameOfUser != "")
+            s_verifiedProperties.nameOfUser = stringToBytes32(nameOfUser);
+        if (primaryPhone != "")
+            s_verifiedProperties.primaryPhone = stringToBytes32(primaryPhone);
+        if (dateOfBirth != "")
+            s_verifiedProperties.dateOfBirth = stringToBytes32(dateOfBirth);
+        if (birthCertificateDocument != "")
+            s_verifiedProperties.birthCertificateDocument = stringToBytes32(
+                birthCertificateDocument
+            );
+        if (countryOfBirth != "")
+            s_verifiedProperties.countryOfBirth = stringToBytes32(
+                countryOfBirth
+            );
+        if (nationalId != "")
+            s_verifiedProperties.nationalId = stringToBytes32(nationalId);
+        if (currentCountryOfResidence != "")
+            s_verifiedProperties.currentCountryOfResidence = stringToBytes32(
+                currentCountryOfResidence
+            );
+        if (currentStateOfResidence != "")
+            s_verifiedProperties.currentStateOfResidence = stringToBytes32(
+                currentStateOfResidence
+            );
+        if (primaryPhysicalAddress != "")
+            s_verifiedProperties.primaryPhysicalAddress = stringToBytes32(
+                primaryPhysicalAddress
+            );
+        if (utilityBillForPrimaryResidence != "")
+            s_verifiedProperties
+                .utilityBillForPrimaryResidence = stringToBytes32(
+                utilityBillForPrimaryResidence
+            );
 
         VerifiedProperties memory newVerifiedProperties = s_verifiedProperties;
 
@@ -237,34 +221,30 @@ contract KYCVerifiedStage0 is FunctionsClient, Ownable {
         ) {
             uint256 adjustedRewardAmount = rewardAmount * PRECISION;
             i_slcToken.mint(msg.sender, adjustedRewardAmount);
+            string memory valueString = weiToEthString(adjustedRewardAmount);;
             emit RewardClaimed(
                 stringToBytes32(sanctumLinkIdentity),
-                rewardAmount
+                adjustedRewardAmount, valueString
             );
             rewardClaimed[stringToBytes32(sanctumLinkIdentity)] = true;
         }
         s_sanctumLinkIdentityToKYCStage0VerifiedProperties[
             stringToBytes32(sanctumLinkIdentity)
         ] = s_verifiedProperties;
-        s_lastError = err;
 
-        // Emit an event to log the response
+        // Emit events to log the response and updated properties
         emit Response(
             requestId,
             stringToBytes32(sanctumLinkIdentity),
             s_verifiedProperties,
-            s_lastResponse,
-            s_lastError
+            response,
+            err
         );
-
-        // Emit an event to log the updated properties
         emit VerifiedPropertiesUpdated(
             stringToBytes32(sanctumLinkIdentity),
             oldVerifiedProperties,
             newVerifiedProperties
         );
-
-        s_lastRequestId = bytes32(0);
     }
 
     // Helper function to convert string to bytes32
@@ -285,5 +265,40 @@ contract KYCVerifiedStage0 is FunctionsClient, Ownable {
             }
         }
         return bytes32(res);
+    }
+
+    function weiToEthString(uint256 valueInWei) internal pure returns (string memory) {
+        uint256 ethUnits = valueInWei / 1 ether;
+        uint256 decimalUnits = (valueInWei % 1 ether) / 10**14; // Get 4 decimal places
+        
+        // Convert uint256 to strings
+        string memory ethUnitsStr = uintToString(ethUnits);
+        string memory decimalUnitsStr = uintToString(decimalUnits);
+        
+        // Ensure 4 decimal places (e.g., 0.0500)
+        while (bytes(decimalUnitsStr).length < 4) {
+            decimalUnitsStr = string(abi.encodePacked("0", decimalUnitsStr));
+        }
+
+        return string(abi.encodePacked(ethUnitsStr, ".", decimalUnitsStr, " SLC"));
+    }
+
+    function uintToString(uint256 value) internal pure returns (string memory) {
+        if (value == 0) {
+            return "0";
+        }
+        uint256 temp = value;
+        uint256 digits;
+        while (temp != 0) {
+            digits++;
+            temp /= 10;
+        }
+        bytes memory buffer = new bytes(digits);
+        while (value != 0) {
+            digits -= 1;
+            buffer[digits] = bytes1(uint8(48 + uint256(value % 10)));
+            value /= 10;
+        }
+        return string(buffer);
     }
 }

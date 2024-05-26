@@ -4,7 +4,7 @@ const abiCoder = ethers.AbiCoder.defaultAbiCoder();
 
 const sanctumLinkIdentity = args[0];
 
-const url = ``; // api url goes here
+const url = `https://sanctum-link-worker.danny-b41.workers.dev/api/v1/identity/${sanctumLinkIdentity}`; // api url goes here
 
 const req = Functions.makeHttpRequest({
     url,
@@ -20,20 +20,14 @@ if (res.error) {
 const dataTypeArray = [`string`]
 const dataValueArray = [sanctumLinkIdentity]
 
-const KYCVerified = res.data[sanctumLinkIdentity]
+const KYCVerified = res.data
 
-KYCVerified.forEach(item => {
-    const key = Object.keys(item)[0]
-    const value = item[key]
-
-    dataTypeArray.push(`string`)
-
-    if (item.verifiedOnChain) {
-        dataValueArray.push(value)
-    } else {
-        dataValueArray.push('')
+for (const key in kycVerifiedStage0) {
+    if (kycVerifiedStage0.hasOwnProperty(key)) {
+        dataTypeArray.push(`string`);
+        dataValueArray.push(kycVerifiedStage0[key]);
     }
-})
+}
 
 const encoded = abiCoder.encode(dataTypeArray, dataValueArray)
 

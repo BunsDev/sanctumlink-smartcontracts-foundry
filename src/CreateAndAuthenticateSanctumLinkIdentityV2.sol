@@ -24,6 +24,18 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
  */
 
 contract CreateAndAuthenticateSanctumLinkIdentityV2 is Ownable {
+    // Custom errors
+    error CreateAndAuthenticateSanctumLinkIdentityV2__WalletNotFound();
+    error CreateAndAuthenticateSanctumLinkIdentityV2__IdentityAlreadyConnectedToWallet();
+    error CreateAndAuthenticateSanctumLinkIdentityV2__WalletAlreadyHasIdentity();
+    error CreateAndAuthenticateSanctumLinkIdentityV2__AddressNotAuthenticated();
+    error CreateAndAuthenticateSanctumLinkIdentityV2__WalletAlreadyConnected();
+    error CreateAndAuthenticateSanctumLinkIdentityV2__WalletNotAuthorizedForAddition();
+    error CreateAndAuthenticateSanctumLinkIdentityV2__InvalidWalletAddress();
+
+    bytes32[] public s_sanctumLinkIdentities;
+    uint256 public authenticationTimeout; // Timeout period in seconds
+
     // Mapping to link connected wallets to SanctumLink Identity
     mapping(bytes32 => address[])
         public s_connectedWalletsToSanctumLinkIdentity;
@@ -65,19 +77,7 @@ contract CreateAndAuthenticateSanctumLinkIdentityV2 is Ownable {
     // Event to emit when the timeout period is updated
     event TimeoutPeriodUpdated(uint256 newTimeoutPeriod);
 
-    // Custom errors
-    error CreateAndAuthenticateSanctumLinkIdentityV2__WalletNotFound();
-    error CreateAndAuthenticateSanctumLinkIdentityV2__IdentityAlreadyConnectedToWallet();
-    error CreateAndAuthenticateSanctumLinkIdentityV2__WalletAlreadyHasIdentity();
-    error CreateAndAuthenticateSanctumLinkIdentityV2__AddressNotAuthenticated();
-    error CreateAndAuthenticateSanctumLinkIdentityV2__WalletAlreadyConnected();
-    error CreateAndAuthenticateSanctumLinkIdentityV2__WalletNotAuthorizedForAddition();
-    error CreateAndAuthenticateSanctumLinkIdentityV2__InvalidWalletAddress();
-
-    bytes32[] public s_sanctumLinkIdentities;
-    uint256 public authenticationTimeout; // Timeout period in seconds
-
-    // _initialTimeout Initial timeout period in seconds
+    // @param _initialTimeout Initial timeout period in seconds
     constructor(uint256 _initialTimeout) Ownable(msg.sender) {
         authenticationTimeout = _initialTimeout;
     }

@@ -24,6 +24,14 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
  */
 
 contract CreateSanctumLinkIdentity is Ownable {
+    // Custom errors
+    error CreateAndAuthenticateSanctumLinkIdentity__WalletNotFound();
+    error CreateAndAuthenticateSanctumLinkIdentity__IdentityAlreadyExists();
+    error CreateAndAuthenticateSanctumLinkIdentity__WalletAlreadyHasIdentity();
+
+    bytes32[] public s_sanctumLinkIdentities;
+    uint256 public authenticationTimeout; // Timeout period in seconds
+
     // Mapping to link connected wallet to SanctumLink Identity
     mapping(bytes32 => address) public s_connectedWalletToSanctumLinkIdentity;
 
@@ -47,14 +55,6 @@ contract CreateSanctumLinkIdentity is Ownable {
 
     // Event to emit when the timeout period is updated
     event TimeoutPeriodUpdated(uint256 newTimeoutPeriod);
-
-    // Custom errors
-    error CreateAndAuthenticateSanctumLinkIdentity__WalletNotFound();
-    error CreateAndAuthenticateSanctumLinkIdentity__IdentityAlreadyExists();
-    error CreateAndAuthenticateSanctumLinkIdentity__WalletAlreadyHasIdentity();
-
-    bytes32[] public s_sanctumLinkIdentities;
-    uint256 public authenticationTimeout; // Timeout period in seconds
 
     // _initialTimeout Initial timeout period in seconds
     constructor(uint256 _initialTimeout) Ownable(msg.sender) {
