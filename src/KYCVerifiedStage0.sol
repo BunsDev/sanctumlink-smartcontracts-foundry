@@ -33,7 +33,7 @@ contract KYCVerifiedStage0 is FunctionsClient, Ownable {
         bytes32 utilityBillForPrimaryResidence;
     }
 
-    CreateAndAuthenticateSanctumLinkIdentityV2 public createAndAuthenticateSanctumLinkIdentity
+    CreateAndAuthenticateSanctumLinkIdentityV2 public createAndAuthenticateSanctumLinkIdentity;
     FunctionsSource internal immutable i_functionsSource;
     SLCToken internal immutable i_slcToken;
 
@@ -79,8 +79,8 @@ contract KYCVerifiedStage0 is FunctionsClient, Ownable {
         subscriptionId = functionSubscriptionId;
         i_functionsSource = new FunctionsSource();
         i_slcToken = _slcToken;
-        createSanctumLinkIdentity = CreateSanctumLinkIdentityV2(
-            _createSanctumLinkIdentity
+        createAndAuthenticateSanctumLinkIdentity = CreateAndAuthenticateSanctumLinkIdentityV2(
+            _createAndAuthenticateSanctumLinkIdentity
         );
 
     }
@@ -153,64 +153,64 @@ contract KYCVerifiedStage0 is FunctionsClient, Ownable {
                 )
             );
 
-        VerifiedProperties memory s_verifiedProperties;
-        s_verifiedProperties = s_sanctumLinkIdentityToKYCStage0VerifiedProperties[
+        VerifiedProperties memory verifiedProperties;
+        verifiedProperties = s_sanctumLinkIdentityToKYCStage0VerifiedProperties[
             stringToBytes32(sanctumLinkIdentity)
         ];
 
-        VerifiedProperties memory oldVerifiedProperties = s_verifiedProperties;
+        VerifiedProperties memory oldVerifiedProperties = verifiedProperties;
         bool isCompletelyPopulated = true;
 
-        if (primaryEmail != "")
-            s_verifiedProperties.primaryEmail = stringToBytes32(primaryEmail);
-        if (nameOfUser != "")
-            s_verifiedProperties.nameOfUser = stringToBytes32(nameOfUser);
-        if (primaryPhone != "")
-            s_verifiedProperties.primaryPhone = stringToBytes32(primaryPhone);
-        if (dateOfBirth != "")
-            s_verifiedProperties.dateOfBirth = stringToBytes32(dateOfBirth);
-        if (birthCertificateDocument != "")
-            s_verifiedProperties.birthCertificateDocument = stringToBytes32(
+        if (stringToBytes32(primaryEmail) != bytes32(0))
+            verifiedProperties.primaryEmail = stringToBytes32(primaryEmail);
+        if (stringToBytes32(nameOfUser) != bytes32(0))
+            verifiedProperties.nameOfUser = stringToBytes32(nameOfUser);
+        if (stringToBytes32(primaryPhone) != bytes32(0))
+            verifiedProperties.primaryPhone = stringToBytes32(primaryPhone);
+        if (stringToBytes32(dateOfBirth) != bytes32(0))
+            verifiedProperties.dateOfBirth = stringToBytes32(dateOfBirth);
+        if (stringToBytes32(birthCertificateDocument) != bytes32(0))
+            verifiedProperties.birthCertificateDocument = stringToBytes32(
                 birthCertificateDocument
             );
-        if (countryOfBirth != "")
-            s_verifiedProperties.countryOfBirth = stringToBytes32(
+        if (stringToBytes32(countryOfBirth) != bytes32(0))
+            verifiedProperties.countryOfBirth = stringToBytes32(
                 countryOfBirth
             );
-        if (nationalId != "")
-            s_verifiedProperties.nationalId = stringToBytes32(nationalId);
-        if (currentCountryOfResidence != "")
-            s_verifiedProperties.currentCountryOfResidence = stringToBytes32(
+        if (stringToBytes32(nationalId) != bytes32(0))
+            verifiedProperties.nationalId = stringToBytes32(nationalId);
+        if (stringToBytes32(currentCountryOfResidence) != bytes32(0))
+            verifiedProperties.currentCountryOfResidence = stringToBytes32(
                 currentCountryOfResidence
             );
-        if (currentStateOfResidence != "")
-            s_verifiedProperties.currentStateOfResidence = stringToBytes32(
+        if (stringToBytes32(currentStateOfResidence) != bytes32(0))
+            verifiedProperties.currentStateOfResidence = stringToBytes32(
                 currentStateOfResidence
             );
-        if (primaryPhysicalAddress != "")
-            s_verifiedProperties.primaryPhysicalAddress = stringToBytes32(
+        if (stringToBytes32(primaryPhysicalAddress) != bytes32(0))
+            verifiedProperties.primaryPhysicalAddress = stringToBytes32(
                 primaryPhysicalAddress
             );
-        if (utilityBillForPrimaryResidence != "")
-            s_verifiedProperties
+        if (stringToBytes32(utilityBillForPrimaryResidence) != bytes32(0))
+            verifiedProperties
                 .utilityBillForPrimaryResidence = stringToBytes32(
                 utilityBillForPrimaryResidence
             );
 
-        VerifiedProperties memory newVerifiedProperties = s_verifiedProperties;
+        VerifiedProperties memory newVerifiedProperties = verifiedProperties;
 
         if (
-            s_verifiedProperties.primaryEmail == bytes32(0) ||
-            s_verifiedProperties.name == bytes32(0) ||
-            s_verifiedProperties.primaryPhone == bytes32(0) ||
-            s_verifiedProperties.dateOfBirth == bytes32(0) ||
-            s_verifiedProperties.birthCertificateDocument == bytes32(0) ||
-            s_verifiedProperties.countryOfBirth == bytes32(0) ||
-            s_verifiedProperties.nationalId == bytes32(0) ||
-            s_verifiedProperties.currentCountryOfResidence == bytes32(0) ||
-            s_verifiedProperties.currentStateOfResidence == bytes32(0) ||
-            s_verifiedProperties.primaryPhysicalAddress == bytes32(0) ||
-            s_verifiedProperties.utilityBillForPrimaryResidence == bytes32(0)
+            verifiedProperties.primaryEmail == bytes32(0) ||
+            verifiedProperties.nameOfUser == bytes32(0) ||
+            verifiedProperties.primaryPhone == bytes32(0) ||
+            verifiedProperties.dateOfBirth == bytes32(0) ||
+            verifiedProperties.birthCertificateDocument == bytes32(0) ||
+            verifiedProperties.countryOfBirth == bytes32(0) ||
+            verifiedProperties.nationalId == bytes32(0) ||
+            verifiedProperties.currentCountryOfResidence == bytes32(0) ||
+            verifiedProperties.currentStateOfResidence == bytes32(0) ||
+            verifiedProperties.primaryPhysicalAddress == bytes32(0) ||
+            verifiedProperties.utilityBillForPrimaryResidence == bytes32(0)
         ) {
             isCompletelyPopulated = false;
         }
@@ -221,7 +221,7 @@ contract KYCVerifiedStage0 is FunctionsClient, Ownable {
         ) {
             uint256 adjustedRewardAmount = rewardAmount * PRECISION;
             i_slcToken.mint(msg.sender, adjustedRewardAmount);
-            string memory valueString = weiToEthString(adjustedRewardAmount);;
+            string memory valueString = weiToEthString(adjustedRewardAmount);
             emit RewardClaimed(
                 stringToBytes32(sanctumLinkIdentity),
                 adjustedRewardAmount, valueString
@@ -230,13 +230,13 @@ contract KYCVerifiedStage0 is FunctionsClient, Ownable {
         }
         s_sanctumLinkIdentityToKYCStage0VerifiedProperties[
             stringToBytes32(sanctumLinkIdentity)
-        ] = s_verifiedProperties;
+        ] = verifiedProperties;
 
         // Emit events to log the response and updated properties
         emit Response(
             requestId,
             stringToBytes32(sanctumLinkIdentity),
-            s_verifiedProperties,
+            verifiedProperties,
             response,
             err
         );
