@@ -68,7 +68,7 @@ contract KYCVerifiedStage0 is Ownable {
     function updateVerifiedPropertiesMock(
         string memory _nameOfUser,
         string memory _primaryPhone,
-        string memory _dateOfBirth,
+        uint256 _dateOfBirth,
         string memory _countryOfBirth,
         string memory _nationalIdNumber,
         string memory _currentCountryOfResidence,
@@ -93,8 +93,9 @@ contract KYCVerifiedStage0 is Ownable {
         if (bytes(_primaryPhone).length > 0) {
             newVerifiedProperties.primaryPhone = hashAttributes(_primaryPhone);
         }
-        if (bytes(_dateOfBirth).length > 0) {
-            newVerifiedProperties.dateOfBirth = hashAttributes(_dateOfBirth);
+        if (_dateOfBirth > 0) {
+            string memory dateOfBirth = uintToString(_dateOfBirth);
+            newVerifiedProperties.dateOfBirth = hashAttributes(dateOfBirth);
         }
         if (bytes(_countryOfBirth).length > 0) {
             newVerifiedProperties.countryOfBirth = hashAttributes(_countryOfBirth);

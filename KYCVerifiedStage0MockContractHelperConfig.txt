@@ -1,0 +1,413 @@
+N.B: All contracts have been deployed on avalanche fuji
+
+// KYCVerifiedStage0Mock Contract
+
+Deployed Contract Address: 0xEAe7F8fC942A44F88A358923a929F3658f8B98f6
+
+ABI:
+[
+	{
+		"inputs": [],
+		"name": "KYCVerifiedStage0Mock__AddressNotAuthenticated",
+		"type": "error"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "owner",
+				"type": "address"
+			}
+		],
+		"name": "OwnableInvalidOwner",
+		"type": "error"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "account",
+				"type": "address"
+			}
+		],
+		"name": "OwnableUnauthorizedAccount",
+		"type": "error"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "previousOwner",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "newOwner",
+				"type": "address"
+			}
+		],
+		"name": "OwnershipTransferred",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "bytes32",
+				"name": "sanctumLinkIdentity",
+				"type": "bytes32"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "valueInWei",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "valueString",
+				"type": "string"
+			}
+		],
+		"name": "RewardClaimed",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "bytes32",
+				"name": "sanctumLinkIdentity",
+				"type": "bytes32"
+			},
+			{
+				"components": [
+					{
+						"internalType": "bytes32",
+						"name": "primaryEmail",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "nameOfUser",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "primaryPhone",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "dateOfBirth",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "countryOfBirth",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "nationalIdNumber",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "currentCountryOfResidence",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "currentStateOfResidence",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "primaryPhysicalAddress",
+						"type": "bytes32"
+					}
+				],
+				"indexed": false,
+				"internalType": "struct KYCVerifiedStage0.VerifiedProperties",
+				"name": "oldVerifiedProperties",
+				"type": "tuple"
+			},
+			{
+				"components": [
+					{
+						"internalType": "bytes32",
+						"name": "primaryEmail",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "nameOfUser",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "primaryPhone",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "dateOfBirth",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "countryOfBirth",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "nationalIdNumber",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "currentCountryOfResidence",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "currentStateOfResidence",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "primaryPhysicalAddress",
+						"type": "bytes32"
+					}
+				],
+				"indexed": false,
+				"internalType": "struct KYCVerifiedStage0.VerifiedProperties",
+				"name": "newVerifiedProperties",
+				"type": "tuple"
+			}
+		],
+		"name": "VerifiedPropertiesUpdated",
+		"type": "event"
+	},
+	{
+		"inputs": [],
+		"name": "renounceOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_rewardAmount",
+				"type": "uint256"
+			}
+		],
+		"name": "setRewardAmount",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "newOwner",
+				"type": "address"
+			}
+		],
+		"name": "transferOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_nameOfUser",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_primaryPhone",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_dateOfBirth",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_countryOfBirth",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_nationalIdNumber",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_currentCountryOfResidence",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_currentStateOfResidence",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_primaryPhysicalAddress",
+				"type": "string"
+			}
+		],
+		"name": "updateVerifiedPropertiesMock",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "contract SLCToken",
+				"name": "_slcToken",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_createAndAuthenticateSanctumLinkIdentity",
+				"type": "address"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"inputs": [],
+		"name": "createAndAuthenticateSanctumLinkIdentity",
+		"outputs": [
+			{
+				"internalType": "contract CreateAndAuthenticateSanctumLinkIdentityV2",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "owner",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "rewardAmount",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "bytes32",
+				"name": "",
+				"type": "bytes32"
+			}
+		],
+		"name": "rewardClaimed",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "bytes32",
+				"name": "",
+				"type": "bytes32"
+			}
+		],
+		"name": "s_sanctumLinkIdentityToKYCStage0VerifiedProperties",
+		"outputs": [
+			{
+				"internalType": "bytes32",
+				"name": "primaryEmail",
+				"type": "bytes32"
+			},
+			{
+				"internalType": "bytes32",
+				"name": "nameOfUser",
+				"type": "bytes32"
+			},
+			{
+				"internalType": "bytes32",
+				"name": "primaryPhone",
+				"type": "bytes32"
+			},
+			{
+				"internalType": "bytes32",
+				"name": "dateOfBirth",
+				"type": "bytes32"
+			},
+			{
+				"internalType": "bytes32",
+				"name": "countryOfBirth",
+				"type": "bytes32"
+			},
+			{
+				"internalType": "bytes32",
+				"name": "nationalIdNumber",
+				"type": "bytes32"
+			},
+			{
+				"internalType": "bytes32",
+				"name": "currentCountryOfResidence",
+				"type": "bytes32"
+			},
+			{
+				"internalType": "bytes32",
+				"name": "currentStateOfResidence",
+				"type": "bytes32"
+			},
+			{
+				"internalType": "bytes32",
+				"name": "primaryPhysicalAddress",
+				"type": "bytes32"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+]
