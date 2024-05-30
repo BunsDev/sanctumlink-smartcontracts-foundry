@@ -156,8 +156,7 @@ contract KYCVerifiedStage0 is FunctionsClient, Ownable {
                 )
             );
 
-        VerifiedProperties memory verifiedProperties;
-        verifiedProperties = s_sanctumLinkIdentityToKYCStage0VerifiedProperties[
+        VerifiedProperties memory verifiedProperties = s_sanctumLinkIdentityToKYCStage0VerifiedProperties[
             stringToBytes32(sanctumLinkIdentity)
         ];
 

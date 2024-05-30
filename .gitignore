@@ -15,3 +15,6 @@ docs/
 
 # Ignores node_modules
 node_modules
+
+# Ignores package-lock.json
+package-lock.json
