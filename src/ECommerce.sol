@@ -95,7 +95,7 @@ contract ECommerce is Ownable, VRFConsumerBaseV2, FunctionsClient {
 
     event ProductToBePurchasedInSLC(bytes32 sanctumLinkIdentity, bytes32 indexed requestId, uint256 indexed productId, uint256 indexed productQuantity, uint256 totalPriceUSD, uint256 totalPriceSLC);
     event ProductToBePurchasedInNative(bytes32 sanctumLinkIdentity, bytes32 indexed requestId, uint256 indexed productId, uint256 indexed productQuantity, uint256 totalPriceUSD, uint256 totalPriceNative);
-    event ProductPurchased(bytes32 sanctumLinkIdentity, address user, uint256 indexed productId, uint256 indexed productQuantity, uint256 indexed totalPriceUSD, uint256 paymentId);
+    event ProductPurchased(bytes32 sanctumLinkIdentity, address user, uint256 indexed productId, uint256 indexed productQuantity, uint256 indexed totalPriceUSD);
     
     // VRF events
     event RequestSent(uint256 requestId, uint32 numWords);
@@ -191,7 +191,7 @@ contract ECommerce is Ownable, VRFConsumerBaseV2, FunctionsClient {
         Product memory product = s_productOrders[requestId];
         // Transfer ISH tokens to the owner
         slcToken.transferFrom(msg.sender, owner(), product.toTransfer);
-        emit ProductPurchased(sanctumLinkIdentity, msg.sender, product.productId, product.productQuantity, product.totalPriceUSD, product.paymentId);
+        emit ProductPurchased(sanctumLinkIdentity, msg.sender, product.productId, product.productQuantity, product.totalPriceUSD);
         delete s_products[_requestId];
     }
 
@@ -204,7 +204,7 @@ contract ECommerce is Ownable, VRFConsumerBaseV2, FunctionsClient {
         Product memory product = s_productOrders[requestId];
         require(msg.value == product.toTransfer, "Incorrect payment amount");
         payable(owner()).transfer(msg.value);
-        emit ProductPurchased(sanctumLinkIdentity, msg.sender, product.productId, product.productQuantity, product.totalPriceUSD, product.paymentId);
+        emit ProductPurchased(sanctumLinkIdentity, msg.sender, product.productId, product.productQuantity, product.totalPriceUSD);
         delete s_products[_requestId];
     }
 
@@ -236,7 +236,6 @@ contract ECommerce is Ownable, VRFConsumerBaseV2, FunctionsClient {
         uint256[] memory _randomWords
     ) internal override {
         require(s_requests[_requestId].exists, "request not found");
-        s_requests[_requestId].fulfilled = true;
         s_requests[_requestId].randomWords = _randomWords;
         lastRandomWords = _randomWords;
 
@@ -247,7 +246,7 @@ contract ECommerce is Ownable, VRFConsumerBaseV2, FunctionsClient {
         s_paymentIdGenerated[paymentId] = true;
         Product memory product = s_productOrders[_requestId];
         product.paymentId = paymentId;
-        
+        s_requests[_requestId].fulfilled = true;
         emit RequestFulfilled(_requestId, _randomWords);
         emit PaymentIdGenerated(paymentId);
         
