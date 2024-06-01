@@ -34,12 +34,6 @@ forge build
 forge test
 ```
 
-## Project Structure
-
-1. **Contracts**: Smart contracts are located in the `src/` directory.
-2. **Scripts**: Deployment scripts are in the `script/` directory.
-3. **Tests**: Test files are located in the `test/` directory.
-
 ## Development Tools
 
 - **Solidity**: Programming language for writing smart contracts.
