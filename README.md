@@ -41,3 +41,13 @@ forge test
 - **Avalanche Fuji**: Testnet for deploying and testing smart contracts.
 
 Check the `ContractHelperConfig.txt` file for information on deployed contracts.
+
+## Deployed Contracts
+
+| SRC | Contract Name | Contract Address | Weblink |
+| :---: | :-------------: | :----------------: | :-------: |
+| [CreateAndAuthenticateSanctumLinkIdentity.sol](./src/CreateAndAuthenticateSanctumLinkIdentity.sol) | CreateAndAuthenticateSanctumLinkIdentity | 0x1d1E6b5c081b7a78dF50D5F5D615A8ad967A6456 | [Snowtrace](https://testnet.snowtrace.io/address/0x1d1E6b5c081b7a78dF50D5F5D615A8ad967A6456) |
+| [CreateAndAuthenticateSanctumLinkIdentityV2.sol](./src/CreateAndAuthenticateSanctumLinkIdentityV2.sol) | CreateAndAuthenticateSanctumLinkIdentityV2 | 0x9E184868d411EB449b44a2629f07842c24DEE778 | [Snowtrace](https://testnet.snowtrace.io/address/0x9E184868d411EB449b44a2629f07842c24DEE778) |
+| [SLCToken.sol](./src/SLCToken.sol) | SLCToken | 0x3bBcf45f1149a1aA7EB2d68A97e7e8A7f6B43E04 | [Snowtrace](https://testnet.snowtrace.io/address/0x3bBcf45f1149a1aA7EB2d68A97e7e8A7f6B43E04) |
+| [KYCVerifiedStage0Mock.sol](./mocks/KYCVerifiedStage0Mock.sol) | KYCVerifiedStage0 | 0xEAe7F8fC942A44F88A358923a929F3658f8B98f64 | [Snowtrace](https://testnet.snowtrace.io/address/0xEAe7F8fC942A44F88A358923a929F3658f8B98f6) |
+| [ECommerceMock.sol](./mocks/ECommerceMock.sol) | ECommerceMock | 0x68B902EF558A3C2A63941de44cb6066CD3F54470 | [Snowtrace](https://testnet.snowtrace.io/address/0x68B902EF558A3C2A63941de44cb6066CD3F54470) |
