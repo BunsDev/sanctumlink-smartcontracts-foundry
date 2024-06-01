@@ -9,8 +9,8 @@ import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol
 import {VRFCoordinatorV2Interface} from "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import {VRFConsumerBaseV2} from "@chainlink/contracts/src/v0.8/vrf/VRFConsumerBaseV2.sol";
 
-import {PriceConverter} from "../../src/PriceConverter.sol";
-import {UintToString} from "../../src/UintToString.sol";
+import {PriceConverter} from "../../libraries/PriceConverter.sol";
+import {UintToString} from "../../libraries/UintToString.sol";
 import {CreateAndAuthenticateSanctumLinkIdentityV2} from "../../src/CreateAndAuthenticateSanctumLinkIdentityV2.sol";
 
 contract ECommerceMock is Ownable, VRFConsumerBaseV2, ReentrancyGuard {

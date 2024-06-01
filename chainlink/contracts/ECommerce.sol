@@ -20,8 +20,8 @@ import {FunctionsClient} from "@chainlink/contracts/src/v0.8/functions/dev/v1_0_
 import {FunctionsRequest} from "@chainlink/contracts/src/v0.8/functions/dev/v1_0_0/libraries/FunctionsRequest.sol";
 
 import {FunctionsSource} from "../../src/FunctionsSource.sol";
-import {PriceConverter} from "../../src/PriceConverter.sol";
-import {UintToString} from "../../src/UintToString.sol";
+import {PriceConverter} from "../../libraries/PriceConverter.sol";
+import {UintToString} from "../../libraries/UintToString.sol";
 import {CreateAndAuthenticateSanctumLinkIdentityV2} from "../../src/CreateAndAuthenticateSanctumLinkIdentityV2.sol";
 
 contract ECommerce is Ownable, VRFConsumerBaseV2, FunctionsClient {
