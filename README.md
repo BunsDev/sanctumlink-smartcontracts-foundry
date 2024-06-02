@@ -6,7 +6,7 @@
 ![Foundry](https://img.shields.io/badge/Foundry-gray)
 ![Avalanche Fuji](https://img.shields.io/badge/Avalanche_Fuji-red)
 
-> Seamless Identity Verification for Web3.
+> The Sanctum Link Protocol: Revolutionizing Web3 KYC.
 
 This repository contains the smart contracts for the SanctumLink project at the [Chainlink Block Magic 2024 Hackathon](https://chain.link/hackathon). The smart contracts are written in Solidity, tested with Foundry, and deployed on the Avalanche Fuji testnet.
 
